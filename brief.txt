@@ -1,0 +1,138 @@
+Анализ приложения GymNet Organizer и проектирование аналога на FastAPI
+Ключевые компоненты системы (на основе схемы):
+Главный судья (GymMain) - управление процессом соревнований
+
+Секретарь (GymNet Organizer) - администрирование и координация
+
+Судьи (A1-E4) - выставление оценок через GymClient
+
+Спортсмены - участники соревнований
+
+Основная таблица оценок - централизованное хранилище результатов
+
+Основные функциональные требования:
+Регистрация участников и судей
+
+Управление ходом соревнований
+
+Запрос и сбор оценок от судей
+
+Автоматический расчет результатов
+
+Реальное обновление данных для всех участников
+
+Архитектура решения на FastAPI
+Технологический стек:
+Backend: FastAPI + SQLAlchemy + WebSockets
+
+База данных: PostgreSQL (для ACID-транзакций)
+
+Кеширование: Redis (для WebSockets и очередей)
+
+Клиент: React/Vue.js (SPA с real-time updates)
+
+Схема взаимодействия:
+Diagram
+Code
+
+
+
+
+
+
+
+
+
+
+
+
+Ключевые эндпоинты FastAPI
+1. Управление соревнованиями (GymMain)
+POST /events - Создать новое соревнование
+
+PUT /events/{event_id}/status - Старт/пауза/финиш
+
+POST /events/{event_id}/athletes - Добавить участника
+
+POST /events/{event_id}/judges - Назначить судей
+
+2. Работа судей (GymClient)
+GET /events/active - Активные соревнования
+
+WS /scoring - WebSocket для получения заданий
+
+POST /scores - Отправить оценку
+
+GET /scores/pending - Ожидающие оценки
+
+3. Администрирование (Organizer)
+POST /scoring-sessions - Создать сессию оценки
+
+WS /updates - Real-time обновления
+
+GET /results/{event_id} - Сводные результаты
+
+POST /finalize - Финализировать результаты
+
+4. Публичное API
+GET /leaderboard - Текущий рейтинг
+
+GET /athletes/{id}/scores - Результаты спортсмена
+
+Логика работы системы
+Последовательность операций:
+Главный судья создает событие:
+
+python
+# Пример payload
+{
+    "name": "Чемпионат по гимнастике 2023",
+    "discipline": "Опорный прыжок",
+    "scoring_schema": "FIG"  // Система оценок
+}
+Организатор запускает сессию оценки:
+
+http
+POST /scoring-sessions
+{
+    "event_id": 123,
+    "athlete_id": 456,
+    "apparatus": "Конь"
+}
+Судьи получают уведомление через WebSocket:
+
+json
+{
+    "action": "new_scoring",
+    "session_id": "abc123",
+    "athlete": "Иванов А.",
+    "apparatus": "Конь",
+    "deadline": "2023-12-01T10:30:00Z"
+}
+Судьи отправляют оценки:
+
+http
+POST /scores
+{
+    "session_id": "abc123",
+    "judge_id": "A1",
+    "scores": [8.5, 9.0, 8.0]
+}
+Система автоматически рассчитывает результат:
+
+python
+def calculate_final(scores: list):
+    # Отбрасываем мин/макс, усредняем по FIG
+    sorted_scores = sorted(scores)
+    return mean(sorted_scores[1:-1])
+Real-time обновление таблицы:
+
+json
+// WebSocket broadcast
+{
+    "athlete_id": 456,
+    "apparatus": "Конь",
+    "scores": {"A1": 8.5, "E4": 9.0},
+    "final_score": 8.75,
+    "position": 3
+}

@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - proxy_data:/app/db  # Монтируем том для папки db
+      - .:/app             # Монтируем текущую директорию для разработки (опционально, удобно для live reload)
+    env_file:
+      - .env             # Используем переменные из .env файла (если он есть)
+    command: sh -c "alembic upgrade head && uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload" # Добавляем --reload для разработки
+
+volumes:
+  proxy_data: # Определяем именованный том
+
+# Переменные окружения можно передать из файла .env
+# Зависит от сервиса базы данных, если она будет отдельным контейнером
+# depends_on:
+#   - db
+# Команда запуска (можно переопределить CMD из Dockerfile, если нужно)
+# command: ["sh", "-c", "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"]
