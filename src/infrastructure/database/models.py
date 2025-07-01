@@ -228,3 +228,242 @@ class Judge(Base):
     region: Mapped[Optional[str]] = mapped_column(String(255))
     pos: Mapped[int] = mapped_column(SmallInteger, default=0)
     rank: Mapped[Optional[str]] = mapped_column(String(255))
+
+
+class Athlete(Base):
+    __tablename__ = "athletes"
+
+    id: Mapped[UUID] = mapped_column(PostgresUUID, primary_key=True, default=uuid.uuid4)
+    flow: Mapped[Optional[UUID]] = mapped_column(
+        PostgresUUID,
+        ForeignKey("flows.id", ondelete="CASCADE"),
+    )
+    name: Mapped[Optional[str]] = mapped_column(String(255))
+    dob: Mapped[Optional[str]] = mapped_column(String(255))
+    category: Mapped[Optional[str]] = mapped_column(String(255))
+    city: Mapped[Optional[str]] = mapped_column(String(255))
+    team: Mapped[Optional[str]] = mapped_column(String(255))
+    coach: Mapped[Optional[str]] = mapped_column(String(255))
+    is_group: Mapped[Optional[int]] = mapped_column(Integer)
+    fullkey: Mapped[Optional[str]] = mapped_column(String(255))
+    start_n: Mapped[Optional[int]] = mapped_column(Integer)
+    pos: Mapped[Optional[int]] = mapped_column(Integer)
+    result: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    result_v1: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    result_v2: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    result_v3: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    result_v4: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    result_v5: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    result_v6: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    result_v7: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    pos_v1: Mapped[Optional[int]] = mapped_column(Integer)
+    pos_v2: Mapped[Optional[int]] = mapped_column(Integer)
+    pos_v3: Mapped[Optional[int]] = mapped_column(Integer)
+    pos_v4: Mapped[Optional[int]] = mapped_column(Integer)
+    pos_v5: Mapped[Optional[int]] = mapped_column(Integer)
+    pos_v6: Mapped[Optional[int]] = mapped_column(Integer)
+    pos_v7: Mapped[Optional[int]] = mapped_column(Integer)
+    subresult: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    penalty: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    post: Mapped[Optional[str]] = mapped_column(String(255))
+    v1: Mapped[Optional[int]] = mapped_column(Integer)
+    v2: Mapped[Optional[int]] = mapped_column(Integer)
+    v3: Mapped[Optional[int]] = mapped_column(Integer)
+    v4: Mapped[Optional[int]] = mapped_column(Integer)
+    checked: Mapped[bool] = mapped_column(Boolean, default=False)
+    music_1: Mapped[Optional[str]] = mapped_column(String(255))
+    music_2: Mapped[Optional[str]] = mapped_column(String(255))
+    music_3: Mapped[Optional[str]] = mapped_column(String(255))
+    music_4: Mapped[Optional[str]] = mapped_column(String(255))
+    music_5: Mapped[Optional[str]] = mapped_column(String(255))
+    music_6: Mapped[Optional[str]] = mapped_column(String(255))
+    music_7: Mapped[Optional[str]] = mapped_column(String(255))
+    performed: Mapped[bool] = mapped_column(Boolean, default=True)
+    ofp: Mapped[bool] = mapped_column(Boolean, default=False)
+    result_ofp1: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    result_ofp2: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    result_ofp3: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    result_ofp4: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    result_ofp5: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    result_ofp6: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    result_ofp7: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    result_ofp8: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    result_ofp9: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    result_ofp10: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_ofp11: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_ofp12: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_ofp13: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_ofp14: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_ofp15: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_est_tv: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_est_av: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_est_ex: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_est_pred: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_est_pred_pos: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_est_tv_f: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_est_av_f: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_est_ex_f: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_est_final: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_est_final_pos: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    est: Mapped[bool] = mapped_column(Boolean, default=False)
+    aer: Mapped[bool] = mapped_column(Boolean, default=False)
+    result_aer_e1: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_aer_e2: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_aer_e3: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_aer_e4: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_aer_e5: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_aer_e6: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_aer_a1: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_aer_a2: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_aer_a3: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_aer_a4: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_aer_a5: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_aer_a6: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_aer_d1d2: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    penalty_aer_dd: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    penalty_aer_cjp: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    penalty_aer_l: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_aer_e: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_aer_a: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    result_aer_d: Mapped[Optional[Numeric]] = mapped_column(
+        Numeric(100, 7), default=0.0
+    )
+    penalty_aer: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    result_aer: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    total_d: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    total_a: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    total_e: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    total_d_v1: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    total_d_v2: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    total_d_v3: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    total_d_v4: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    total_d_v5: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    total_d_v6: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    total_d_v7: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    total_a_v1: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    total_a_v2: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    total_a_v3: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    total_a_v4: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    total_a_v5: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    total_a_v6: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    total_a_v7: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    total_e_v1: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    total_e_v2: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    total_e_v3: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    total_e_v4: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    total_e_v5: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    total_e_v6: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    total_e_v7: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 7), default=0.0)
+    man: Mapped[bool] = mapped_column(Boolean, default=False)
+    kat: Mapped[bool] = mapped_column(Boolean, default=False)
+    kat_1_res_0: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 2), default=0.0)
+    kat_1_res_1: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 2), default=0.0)
+    kat_1_res_2: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 2), default=0.0)
+    kat_1_res_3: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 2), default=0.0)
+    kat_1_res_4: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 2), default=0.0)
+    kat_2_res_0: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 2), default=0.0)
+    kat_2_res_1: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 2), default=0.0)
+    kat_2_res_2: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 2), default=0.0)
+    kat_2_res_3: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 2), default=0.0)
+    kat_2_res_4: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 2), default=0.0)
+    kat_f_res_0: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 2), default=0.0)
+    kat_f_res_1: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 2), default=0.0)
+    kat_f_res_2: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 2), default=0.0)
+    kat_f_res_3: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 2), default=0.0)
+    kat_f_res_4: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 2), default=0.0)
+    kat_1_res: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 2), default=0.0)
+    kat_2_res: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 2), default=0.0)
+    kat_f_res: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 2), default=0.0)
+    kat_1_2_res: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 2), default=0.0)
+    kat_1_2_pos: Mapped[Optional[int]] = mapped_column(Integer, default=0)
+    kat_f_pos: Mapped[Optional[int]] = mapped_column(Integer, default=0)
+    kat_1_min: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 2), default=0.0)
+    kat_1_max: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 2), default=0.0)
+    kat_2_min: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 2), default=0.0)
+    kat_2_max: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 2), default=0.0)
+    kat_f_min: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 2), default=0.0)
+    kat_f_max: Mapped[Optional[Numeric]] = mapped_column(Numeric(100, 2), default=0.0)
+    kat_type: Mapped[Optional[int]] = mapped_column(Integer, default=0)
+    kat_flag1: Mapped[Optional[int]] = mapped_column(Integer, default=0)
+    kat_flag2: Mapped[Optional[int]] = mapped_column(Integer, default=0)
+    kat_1_min_n: Mapped[Optional[int]] = mapped_column(Integer, default=0)
+    kat_1_max_n: Mapped[Optional[int]] = mapped_column(Integer, default=0)
+    kat_2_min_n: Mapped[Optional[int]] = mapped_column(Integer, default=0)
+    kat_2_max_n: Mapped[Optional[int]] = mapped_column(Integer, default=0)
+    kat_f_min_n: Mapped[Optional[int]] = mapped_column(Integer, default=0)
+    kat_f_max_n: Mapped[Optional[int]] = mapped_column(Integer, default=0)
+    art: Mapped[bool] = mapped_column(Boolean, default=False)
+    art_boy: Mapped[bool] = mapped_column(Boolean, default=False)
+    art_vk: Mapped[bool] = mapped_column(Boolean, default=False)
+    medal: Mapped[bool] = mapped_column(Boolean, default=False)
+    v5: Mapped[Optional[int]] = mapped_column(Integer)
+    v6: Mapped[Optional[int]] = mapped_column(Integer)
+    is_group_type: Mapped[Optional[int]] = mapped_column(Integer)
