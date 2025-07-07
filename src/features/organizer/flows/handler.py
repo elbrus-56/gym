@@ -7,177 +7,136 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from src.core.depends import get_db
-from src.features.organizer.competitions.schemas import CompetitionStatus
-from src.core.enums import CompetitionStatus
-from src.infrastructure.database.models import Competition
-from src.features.organizer.competitions.schemas import (
-    CompetitionCreate,
-    CompetitionResponse,
-    CompetitionUpdate,
+from src.infrastructure.database.models import (
+    Flow,
+    Group,
+)
+from src.features.organizer.flows.schemas import (
+    FlowCreate,
+    FlowUpdate,
+    FlowResponse,
 )
 
 router = APIRouter(
-    prefix="/competitions",
-    tags=["Competitions"],
+    prefix="/flows",
+    tags=["Flows"],
     responses={404: {"description": "Not found"}},
 )
 
 
-async def _get_competition_or_404(db: Session, competition_id: UUID) -> Competition:
-    """Вспомогательная функция для получения соревнования или выброса исключения"""
-    competition = await db.scalar(
-        select(Competition).where(Competition.id == competition_id)
-    )
-    if not competition:
+async def _get_flow_or_404(db: Session, flow_id: UUID) -> Flow:
+    """Получить поток по ID или вызвать 404 ошибку"""
+    flow = await db.scalar(select(Flow).where(Flow.id == flow_id))
+    if not flow:
         raise HTTPException(
-            status_code=404,
-            detail=f"Соревнование с ID {competition_id} не найдено",
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Flow with ID {flow_id} not found",
         )
-    return competition
+    return flow
+
+
+async def _check_group_exists(db: Session, group_id: UUID) -> None:
+    """Проверить существование группы"""
+    if group_id and not await db.scalar(select(Group).where(Group.id == group_id)):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Group with ID {group_id} does not exist",
+        )
 
 
 @router.post(
     "/",
-    response_model=CompetitionResponse,
     status_code=status.HTTP_201_CREATED,
-    summary="Создать новое соревнование",
-    description="Создает новое соревнование с указанными параметрами",
+    summary="Создать новый поток",
+    response_model=FlowResponse,
 )
-async def create_competition(
-    competition: CompetitionCreate,
+async def create_flow(
+    flow_data: FlowCreate,
     db: Session = Depends(get_db),
 ):
     """
-    Создает новое соревнование
-
-    - **name**: Название соревнования (обязательно)
-    - **description**: Описание соревнования
-    - **discipline**: Дисциплина (например, "Художественная гимнастика")
-    - **start_date**: Дата начала (YYYY-MM-DD)
-    - **end_date**: Дата окончания (YYYY-MM-DD)
-    - **location**: Место проведения
+    Создает новый поток с валидацией группы при наличии
     """
-    db_competition = Competition(**competition.model_dump())
-    db.add(db_competition)
-    await db.flush()
-    await db.refresh(db_competition)
-    return db_competition
+    if flow_data.group:
+        await _check_group_exists(db, flow_data.group)
+
+    new_flow = Flow(**flow_data.model_dump())
+    db.add(new_flow)
+    await db.commit()
+    await db.refresh(new_flow)
+    return new_flow
 
 
 @router.get(
     "/",
-    response_model=List[CompetitionResponse],
-    summary="Получить список соревнований",
-    description="Возвращает список всех соревнований с возможностью фильтрации",
+    summary="Получить список потоков",
+    response_model=List[FlowResponse],
 )
-async def read_competitions(
-    status_filter: Optional[CompetitionStatus] = None,
-    skip: int = 0,
-    limit: int = 100,
+async def read_flows(
+    group_id: Optional[UUID] = None,
+    name: Optional[str] = None,
+    brake_type: Optional[int] = None,
     db: Session = Depends(get_db),
 ):
     """
-    Получает список соревнований
-
-    Параметры запроса:
-    - **status_filter**: Фильтр по статусу (planned, active, completed)
-    - **skip**: Количество записей для пропуска (пагинация)
-    - **limit**: Максимальное количество возвращаемых записей
+    Получает список потоков с опциональной фильтрацией
     """
-    stmt = select(Competition)
+    stmt = select(Flow)
 
-    if status_filter:
-        stmt = stmt.filter(Competition.status == status_filter)
+    if group_id:
+        stmt = stmt.where(Flow.group == group_id)
+    if name:
+        stmt = stmt.where(Flow.name == name)
+    if brake_type is not None:
+        stmt = stmt.where(Flow.brake_type == brake_type)
 
-    result = await db.execute(stmt.offset(skip).limit(limit))
-    return result.scalars().all()
+    result = await db.scalars(stmt)
+    return result.all()
 
 
 @router.get(
-    "/{competition_id}",
-    response_model=CompetitionResponse,
-    summary="Получить детали соревнования",
-    description="Возвращает полную информацию о конкретном соревновании",
+    "/{flow_id}",
+    summary="Получить поток по ID",
+    response_model=FlowResponse,
 )
-async def read_competition(
-    competition_id: UUID,
-    db: Session = Depends(get_db),
-):
-    """
-    Получает детальную информацию о соревновании по ID
-    """
-    return await _get_competition_or_404(db, competition_id)
-
-
-@router.put(
-    "/{competition_id}",
-    response_model=CompetitionResponse,
-    summary="Обновить данные соревнования",
-    description="Обновляет информацию о соревновании",
-)
-async def update_competition(
-    competition_id: UUID,
-    competition: CompetitionUpdate,
-    db: Session = Depends(get_db),
-):
-    db_competition = await _get_competition_or_404(db, competition_id)
-
-    update_data = competition.model_dump(exclude_unset=True)
-    for field, value in update_data.items():
-        setattr(db_competition, field, value)
-
-    db_competition.updated_at = datetime.now(timezone.utc)
-    await db.refresh(db_competition)
-    return db_competition
+async def read_flow(flow_id: UUID, db: Session = Depends(get_db)):
+    """Получает детальную информацию о потоке по его ID"""
+    return await _get_flow_or_404(db, flow_id)
 
 
 @router.patch(
-    "/{competition_id}/status",
-    response_model=CompetitionResponse,
-    summary="Изменить статус соревнования",
-    description="Обновляет статус соревнования (planned, active, completed)",
+    "/{flow_id}", summary="Обновить данные потока", response_model=FlowResponse
 )
-async def update_competition_status(
-    competition_id: UUID,
-    status_update: CompetitionStatus,
+async def update_flow(
+    flow_id: UUID,
+    update_data: FlowUpdate,
     db: Session = Depends(get_db),
 ):
     """
-    Изменяет статус соревнования
+    Обновляет данные потока с проверками:
+    - Существование потока
+    - Существование группы (если она изменена)
     """
-    db_competition = await _get_competition_or_404(db, competition_id)
+    flow = await _get_flow_or_404(db, flow_id)
 
-    db_competition.status = status_update
+    # Проверка существования группы (если указана)
+    if update_data.group is not None:
+        await _check_group_exists(db, update_data.group)
 
-    if status_update == CompetitionStatus.ACTIVE:
-        db_competition.started_at = datetime.now(timezone.utc)
-    elif status_update == CompetitionStatus.COMPLETED:
-        db_competition.completed_at = datetime.now(timezone.utc)
+    update_values = update_data.model_dump(exclude_unset=True)
 
-    db_competition.updated_at = datetime.now(timezone.utc)
-    await db.refresh(db_competition)
-    return db_competition
+    for field, value in update_values.items():
+        setattr(flow, field, value)
+
+    flow.updated_at = datetime.now(timezone.utc)
+    await db.refresh(flow)
+    return flow
 
 
 @router.delete(
-    "/{competition_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
-    summary="Удалить соревнование",
-    description="Удаляет соревнование и все связанные данные",
+    "/{flow_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Удалить поток"
 )
-async def delete_competition(
-    competition_id: UUID,
-    db: Session = Depends(get_db),
-):
-    """
-    Удаляет соревнование по ID
-    """
-    db_competition = await _get_competition_or_404(db, competition_id)
-
-    if db_competition.status == CompetitionStatus.ACTIVE:
-        raise HTTPException(
-            status_code=400, detail="Нельзя удалить активное соревнование"
-        )
-
-    await db.delete(db_competition)
-    return None
+async def delete_flow(flow_id: UUID, db: Session = Depends(get_db)) -> None:
+    """Удаляет поток по ID"""
+    flow = await _get_flow_or_404(db, flow_id)
+    await db.delete(flow)

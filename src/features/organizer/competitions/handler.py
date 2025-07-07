@@ -127,7 +127,6 @@ async def update_competition(
         setattr(db_competition, field, value)
 
     db_competition.updated_at = datetime.now(timezone.utc)
-    await db.refresh(db_competition)
     return db_competition
 
 
@@ -155,7 +154,6 @@ async def update_competition_status(
         db_competition.completed_at = datetime.now(timezone.utc)
 
     db_competition.updated_at = datetime.now(timezone.utc)
-    await db.refresh(db_competition)
     return db_competition
 
 

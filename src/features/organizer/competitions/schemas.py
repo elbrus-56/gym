@@ -6,6 +6,10 @@ from typing import Optional, Union
 from src.core.enums import CompetitionStatus
 
 
+class CompetitionID(BaseModel):
+    id: UUID
+
+
 class CompetitionBase(BaseModel):
     name: str = Field(..., max_length=255)
     location: Optional[str] = Field(None, max_length=255)
@@ -40,8 +44,7 @@ class CompetitionUpdate(CompetitionBase):
     pass
 
 
-class CompetitionResponse(CompetitionBase):
-    id: UUID
+class CompetitionResponse(CompetitionBase, CompetitionID):
     created_at: datetime.datetime
     updated_at: datetime.datetime
     started_at: datetime.datetime | None = None

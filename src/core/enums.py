@@ -12,3 +12,8 @@ class SessionStatus(str, enum.Enum):
     ACTIVE = "active"
     COMPLETED = "completed"
     APPROVED = "approved"  # утверждено главным судьей
+
+
+class TypeEvents(str, enum.Enum):
+    EVENTS_1 = "events_1"
+    EVENTS_2 = "events_2"

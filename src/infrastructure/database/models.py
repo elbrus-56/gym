@@ -17,7 +17,7 @@ from sqlalchemy import (
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase
 
-from src.core.enums import CompetitionStatus, SessionStatus
+from src.core.enums import CompetitionStatus, TypeEvents, SessionStatus
 from sqlalchemy import Column, String, DateTime, Enum, func
 from sqlalchemy.dialects.postgresql import UUID as PostgresUUID
 from datetime import datetime, timezone
@@ -31,6 +31,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Index,
+    Date,
 )
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, relationship
 
@@ -79,21 +80,26 @@ class Period(Base):
     __tablename__ = "periods"
 
     id: Mapped[UUID] = mapped_column(PostgresUUID, primary_key=True, default=uuid.uuid4)
-    value: Mapped[Optional[str]] = mapped_column(String(20))
+    date: Mapped[Optional[datetime]] = mapped_column(Date)
     competition: Mapped[Optional[UUID]] = mapped_column(
         PostgresUUID,
         ForeignKey("competitions.id", ondelete="CASCADE", onupdate="CASCADE"),
     )
     name: Mapped[Optional[str]] = mapped_column(String(255))
-    hour_from: Mapped[Optional[str]] = mapped_column(String(10))
-    min_from: Mapped[Optional[str]] = mapped_column(String(10))
-    hour_to: Mapped[Optional[str]] = mapped_column(String(10))
-    min_to: Mapped[Optional[str]] = mapped_column(String(10))
+    started_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
     age_from: Mapped[Optional[str]] = mapped_column(String(10))
     age_to: Mapped[Optional[str]] = mapped_column(String(10))
-    fullkey: Mapped[Optional[str]] = mapped_column(String(255))
     n: Mapped[Optional[int]] = mapped_column(SmallInteger)
     art: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
 
 
 class Group(Base):
@@ -191,6 +197,14 @@ class Group(Base):
     age_group_num: Mapped[Optional[int]] = mapped_column(SmallInteger, default=0)
     age_group_name: Mapped[Optional[str]] = mapped_column(String(255))
     step_name: Mapped[Optional[str]] = mapped_column(String(255))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
 
 
 class Flow(Base):
@@ -210,6 +224,14 @@ class Flow(Base):
     fullkey: Mapped[Optional[str]] = mapped_column(String(255))
     brake_name: Mapped[Optional[str]] = mapped_column(String(255))
     brake_type: Mapped[Optional[int]] = mapped_column(SmallInteger)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
 
 
 class Judge(Base):
@@ -467,3 +489,25 @@ class Athlete(Base):
     v5: Mapped[Optional[int]] = mapped_column(Integer)
     v6: Mapped[Optional[int]] = mapped_column(Integer)
     is_group_type: Mapped[Optional[int]] = mapped_column(Integer)
+
+
+class Event(Base):
+    __tablename__ = "events"
+
+    id: Mapped[UUID] = mapped_column(PostgresUUID, primary_key=True, default=uuid.uuid4)
+    name: Mapped[TypeEvents] = mapped_column(Enum(TypeEvents))
+    competition: Mapped[UUID] = mapped_column(
+        PostgresUUID,
+        ForeignKey("competitions.id", ondelete="CASCADE", onupdate="CASCADE"),
+    )
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    completed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
